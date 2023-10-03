@@ -1,5 +1,6 @@
 package happiness.diary.oauth2;
 
+import happiness.diary.member.Member;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -25,22 +26,27 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         String userNameAttributeName = userRequest.getClientRegistration()
                 .getProviderDetails().getUserInfoEndpoint().getUserNameAttributeName();// OAuth 로그인 시 키(pk)가 되는 값
 
-//        System.out.println(userNameAttributeName);
-        log.info(userNameAttributeName);
+        log.info("userNameAttributeName= {}",userNameAttributeName);
         Map<String, Object> attributes = oAuth2User.getAttributes();
         for (String key : attributes.keySet()) {
-//            System.out.println(key+" "+attributes.get(key));
-            log.info("{} {}", key, attributes.get(key));
+            log.info("{}= {}", key, attributes.get(key));
         }
         OAuth2Attribute oAuth2Attribute =
                 OAuth2Attribute.of(registrationId, userNameAttributeName, oAuth2User.getAttributes());
 
-        Map<String, Object> memberAttribute = oAuth2Attribute.convertToMap();
+
+//        Map<String, Object> memberAttribute = oAuth2Attribute.convertToMap();
 //        return new DefaultOAuth2User(
 //                Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")),
-//                memberAttribute, userNameAttributeName);
+//                memberAttribute, "email");
+//        return new DefaultOAuth2User(
+//                Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")),
+//                oAuth2Attribute.getAttributes(), oAuth2Attribute.getAttributeKey());
         return new DefaultOAuth2User(
                 Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")),
-                oAuth2Attribute.getAttributes(), userNameAttributeName);
+                attributes, userNameAttributeName);
     }
+
+//    private Member saveOrUpdate() {
+//    }
 }

@@ -74,7 +74,6 @@ public class OAuth2Attribute {
         Map<String, Object> map = new HashMap<>();
         map.put("id", attributeKey);
         map.put("key", attributeKey);
-//        map.put(attributeKey, attributes.get(attributeKey));
         map.put("name", name);
         map.put("email", email);
         map.put("picture", picture);

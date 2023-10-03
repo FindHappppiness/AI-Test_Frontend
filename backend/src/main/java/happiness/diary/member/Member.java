@@ -1,4 +1,4 @@
-package happiness.diary.domain;
+package happiness.diary.member;
 
 import lombok.*;
 
@@ -25,4 +25,7 @@ public class Member {
 
     @Column(nullable = false, unique = true)
     private String nickname;
+
+    @Enumerated(EnumType.STRING)
+    private Role role;
 }

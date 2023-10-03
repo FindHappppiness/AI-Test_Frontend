@@ -44,6 +44,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         response.setContentType("application/json;charset=UTF-8");
 
         PrintWriter writer = response.getWriter();
+
         writer.println(objectMapper.writeValueAsString(token));
         writer.flush();
     }
