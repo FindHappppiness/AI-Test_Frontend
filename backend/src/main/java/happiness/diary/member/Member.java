@@ -14,18 +14,27 @@ public class Member {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String oauthId;
+
     @Column(nullable = false)
     private String name;
 
     @Column(nullable = false)
     private String email;
 
+    @Column
+    private String picture;
+
     @Column(nullable = false)
     private String provider;
 
-    @Column(nullable = false, unique = true)
-    private String nickname;
-
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    public Member update(String name, String email, String picture) {
+        this.name = name;
+        this.email = email;
+        this.picture = picture;
+        return this;
+    }
 }
