@@ -1,6 +1,8 @@
 package happiness.diary.oauth2;
 
-import happiness.diary.member.Member;
+import happiness.diary.user.User;
+import happiness.diary.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -16,7 +18,9 @@ import java.util.Map;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
+    private final UserRepository userRepository;
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2UserService<OAuth2UserRequest, OAuth2User> oAuth2UserService = new DefaultOAuth2UserService();
@@ -31,22 +35,27 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         for (String key : attributes.keySet()) {
             log.info("{}= {}", key, attributes.get(key));
         }
-        OAuth2Attribute oAuth2Attribute =
-                OAuth2Attribute.of(registrationId, userNameAttributeName, oAuth2User.getAttributes());
+        OAuth2Attributes oAuth2Attributes =
+                OAuth2Attributes.of(registrationId, userNameAttributeName, oAuth2User.getAttributes());
+        User user = saveOrUpdate(oAuth2Attributes);
 
 
-//        Map<String, Object> memberAttribute = oAuth2Attribute.convertToMap();
-//        return new DefaultOAuth2User(
-//                Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")),
-//                memberAttribute, "email");
+        return new DefaultOAuth2User(
+                Collections.singleton(new SimpleGrantedAuthority(user.getRole().getKey())),
+                oAuth2Attributes.convertToMap(), "email");
 //        return new DefaultOAuth2User(
 //                Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")),
 //                oAuth2Attribute.getAttributes(), oAuth2Attribute.getAttributeKey());
-        return new DefaultOAuth2User(
-                Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")),
-                attributes, userNameAttributeName);
+//        return new DefaultOAuth2User(
+//                Collections.singleton(new SimpleGrantedAuthority(user.getRole().getKey())),
+//                attributes, userNameAttributeName);
     }
 
-//    private Member saveOrUpdate() {
-//    }
+    private User saveOrUpdate(OAuth2Attributes oAuth2Attributes) {
+        User user = userRepository.findByEmail(oAuth2Attributes.getEmail())
+                .map(entity -> entity.update(oAuth2Attributes.getName(), oAuth2Attributes.getEmail(), oAuth2Attributes.getPicture()))
+                .orElse(oAuth2Attributes.toEntity());
+
+        return userRepository.save(user);
+    }
 }

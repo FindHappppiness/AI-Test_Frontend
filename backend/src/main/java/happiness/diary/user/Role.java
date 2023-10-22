@@ -1,4 +1,4 @@
-package happiness.diary.member;
+package happiness.diary.user;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

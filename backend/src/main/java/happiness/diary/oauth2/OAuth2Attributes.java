@@ -1,5 +1,7 @@
 package happiness.diary.oauth2;
 
+import happiness.diary.user.Role;
+import happiness.diary.user.User;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,30 +13,34 @@ import java.util.Map;
 @ToString
 @Builder(access = AccessLevel.PRIVATE)
 @Getter
-public class OAuth2Attribute {
+public class OAuth2Attributes {
     private Map<String, Object> attributes;
     private String attributeKey;
+    private String oauthId;
+    private String provider;
     private String email;
     private String name;
     private String picture;
 
-    static OAuth2Attribute of(String provider, String attributeKey,
-                              Map<String, Object> attributes) {
+    static OAuth2Attributes of(String provider, String attributeKey,
+                               Map<String, Object> attributes) {
         switch (provider) {
             case "google":
-                return ofGoogle(attributeKey, attributes);
+                return ofGoogle(provider, attributeKey, attributes);
             case "kakao":
-                return ofKakao("email", attributes);
+                return ofKakao(provider, "email", attributes);
             case "naver":
-                return ofNaver("id", attributes);
+                return ofNaver(provider, "id", attributes);
             default:
                 throw new RuntimeException();
         }
     }
 
-    private static OAuth2Attribute ofGoogle(String attributeKey,
-                                            Map<String, Object> attributes) {
-        return OAuth2Attribute.builder()
+    private static OAuth2Attributes ofGoogle(String provider, String attributeKey,
+                                             Map<String, Object> attributes) {
+        return OAuth2Attributes.builder()
+                .oauthId((String) attributes.get("sub"))
+                .provider(provider)
                 .name((String) attributes.get("name"))
                 .email((String) attributes.get("email"))
                 .picture((String)attributes.get("picture"))
@@ -43,12 +49,14 @@ public class OAuth2Attribute {
                 .build();
     }
 
-    private static OAuth2Attribute ofKakao(String attributeKey,
-                                           Map<String, Object> attributes) {
+    private static OAuth2Attributes ofKakao(String provider, String attributeKey,
+                                            Map<String, Object> attributes) {
         Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
         Map<String, Object> kakaoProfile = (Map<String, Object>) kakaoAccount.get("profile");
 
-        return OAuth2Attribute.builder()
+        return OAuth2Attributes.builder()
+                .oauthId(String.valueOf(attributes.get("id")))
+                .provider(provider)
                 .name((String) kakaoProfile.get("nickname"))
                 .email((String) kakaoAccount.get("email"))
                 .picture((String) kakaoProfile.get("profile_image_url"))
@@ -57,11 +65,13 @@ public class OAuth2Attribute {
                 .build();
     }
 
-    private static OAuth2Attribute ofNaver(String attributeKey,
-                                           Map<String, Object> attributes) {
+    private static OAuth2Attributes ofNaver(String provider, String attributeKey,
+                                            Map<String, Object> attributes) {
         Map<String, Object> response = (Map<String, Object>) attributes.get("response");
 
-        return OAuth2Attribute.builder()
+        return OAuth2Attributes.builder()
+                .oauthId((String) response.get("id"))
+                .provider(provider)
                 .name((String) response.get("name"))
                 .email((String) response.get("email"))
                 .picture((String) response.get("profile_image"))
@@ -70,14 +80,22 @@ public class OAuth2Attribute {
                 .build();
     }
 
+    public User toEntity() {
+        return User.builder()
+                .oauthId(oauthId)
+                .provider(provider)
+                .name(name)
+                .email(email)
+                .picture(picture)
+                .role(Role.USER)
+                .build();
+    }
+
     Map<String, Object> convertToMap() {
         Map<String, Object> map = new HashMap<>();
-        map.put("id", attributeKey);
-        map.put("key", attributeKey);
         map.put("name", name);
         map.put("email", email);
         map.put("picture", picture);
-
         return map;
     }
 }

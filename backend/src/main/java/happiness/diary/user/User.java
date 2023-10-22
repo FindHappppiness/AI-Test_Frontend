@@ -1,4 +1,4 @@
-package happiness.diary.member;
+package happiness.diary.user;
 
 import lombok.*;
 
@@ -9,7 +9,7 @@ import javax.persistence.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
-public class Member {
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -31,7 +31,7 @@ public class Member {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    public Member update(String name, String email, String picture) {
+    public User update(String name, String email, String picture) {
         this.name = name;
         this.email = email;
         this.picture = picture;
