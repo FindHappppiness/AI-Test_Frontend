@@ -3,9 +3,9 @@ import styled from 'styled-components';
 const ContactSection = () => {
 	return (
 		<ContactSectionContainer>
-			<p>서장호 (jangho_seo@tmax.co.kr)</p>
-			<p>이상협(sanghyeop_lee@tmax.co.kr)</p>
-			<p>이정민 (jeongmin_lee2@tmax.co.kr)</p> <p>류현주 (hyunju_ryu@tmax.co.kr)</p>
+			<p>서장호</p>
+			<p>이상협</p>
+			<p>이정민</p> <p>류현주</p>
 		</ContactSectionContainer>
 	);
 };
